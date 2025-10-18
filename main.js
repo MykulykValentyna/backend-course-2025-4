@@ -14,16 +14,16 @@ program
 program.parse(process.argv);//аналізуємо параметри з командного рядка
 const options = program.opts();//отримаємо значення параметрів у об'єкт
 //перевіряємо чи існує вказаний файл
-if (!fs.existsSync(ontransitionstart.input)) {
+if (!fs.existsSync(options.input)) {
     console.error("Cannot find input file");
     process.exit(1);
 }
 //створюємо HTTP сервер, який оброблятиме запити
-const server = http.createServer(async(requestAnimationFrame, res)=>{
+const server = http.createServer(async(req, res)=>{
     console.log("HTTP request:");
-    console.log("Method:", requestAnimationFrame.method);
-    console.log("URL:", requestAnimationFrame.url);
-    console.log("Headers:", requestAnimationFrame.headers);
+    console.log("Method:", req.method);
+    console.log("URL:", req.url);
+    console.log("Headers:", req.headers);
     try{
         const data=await readFile(options.input, 'utf-8');//асинхронне читання вмісту файлу
         //обробляємо дані з файлу
@@ -33,7 +33,7 @@ const server = http.createServer(async(requestAnimationFrame, res)=>{
             .filter(line=>line)//Х порожні рядки
             .map(line=>JSON.parse(line));//кожен рядок -> об'єкт
         //аналізуємо URL запит для отримання параметрів
-        const url=new URL(requestAnimationFrame.url, 'http://${options.host}:${options.port}');
+        const url=new URL(req.url, `http://${options.host}:${options.port}`);
         //отримуємо параметр "furnished"
         const furnishedOnly=url.searchParams.get('furnished')==='true';
         //отримуємо параметр "max_price"
@@ -73,6 +73,7 @@ const server = http.createServer(async(requestAnimationFrame, res)=>{
         //об'єкт -> XML рядок
         const xml = builder.build(xmlData);
         const outputFileName = 'filtered_houses.xml';
+        //асинхронний запис
         await writeFile(outputFileName, xml, 'utf-8');
         console.log(`[INFO] XML result written to ${outputFileName}`);
         //інформація про відповідь
@@ -93,5 +94,5 @@ const server = http.createServer(async(requestAnimationFrame, res)=>{
 //запускаємо сервер на вказаних хості й порті
 server.listen(options.port, options.host, () => {
     //повідомлення, що запущено
-    console.log('Server running at http://${options.host}:${options.port}/');
+    console.log(`Server running at http://${options.host}:${options.port}/`);
 });
