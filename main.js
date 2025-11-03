@@ -43,10 +43,14 @@ const server = http.createServer(async(req, res)=>{
         //починаємо зі всіх будинків
         let filteredHouses=houses;
         //якщо тільки мебльовані
-        if(furnishedOnly){
-            //де тільки furnished
-            filteredHouses=filteredHouses.filter(house=>house.furnishingstatus==="furnished");
+         if(furnishedOnly === "furnished"){
+            filteredHouses = filteredHouses.filter(house => house.furnishingstatus === "furnished");
+        } else if(furnishedOnly === "semi-furnished"){
+            filteredHouses = filteredHouses.filter(house => house.furnishingstatus === "semi-furnished");
+        } else if(furnishedOnly === "unfurnished"){
+            filteredHouses = filteredHouses.filter(house => house.furnishingstatus === "unfurnished");
         }
+        // якщо furnishedOnly = false або null - не фільтруємо за статусом меблювання
         //якщо вказана максимальна ціна
         if (maxPrice){
             //лишаємо лиш ті будинки, у яких ціна менша за вказану
